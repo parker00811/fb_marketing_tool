@@ -1,0 +1,83 @@
+.container {
+  padding: 100px 15px;
+}
+
+.cover-container {
+  width: 110px;
+  margin: 30px auto;
+}
+
+#result, #lottery_result {
+  margin: 30px 0;
+}
+
+#lottery_result {
+  display: none;
+}
+
+.button_group {
+  float: right;
+}
+
+.clearfix:after {
+  content: "";
+  display: block;
+  height: 0;
+  clear: both;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.like_td_1, .like_td_2, .share_td_1, .share_td_2 {
+  width: 50%;
+}
+
+.comment_td_1 {
+  width: 10%;
+}
+
+.comment_td_2 {
+  width: 15%;
+}
+
+.comment_td_3 {
+  width: 65%;
+}
+
+.comment_td_4 {
+  width: 10%;
+}
+
+#loading-little {
+    top: 0px;
+    position: fixed;
+    z-index: 9999999;
+}
+
+#success-notification {
+    background-color: #d9f2f2;
+    color: #000000;
+    display: none;
+    height: 50px;
+    line-height: 50px;
+    opacity: 0.9;
+    position: fixed;
+    text-align: center;
+    top: 0px;
+    width: 100%;
+    z-index: 9999999;
+}
+
+#warning-notification {
+    background-color: #FFB6C1;
+    color: #000000;
+    display: none;
+    height: 50px;
+    line-height: 50px;
+    opacity: 0.9;
+    position: fixed;
+    text-align: center;
+    top: 0px;
+    width: 100%;
+    z-index: 9999999;
+}
