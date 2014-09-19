@@ -33,6 +33,7 @@ $(function () {
         result += "<td class='like_td_2'>facebook id</td>"
         result += "</tr></thead><tbody>";
 
+        var gender = new Array();
         var count = 1;
 
         $.each(response_data.data, function (data, user_obj) {
@@ -40,6 +41,18 @@ $(function () {
           result += "<td>" + count.toString() + "</td>";
           result += "<td>" + user_obj.id + "</td>";
           result += "</tr>";
+
+          get_gender(user_obj.id, function(user_gender){
+            gender.push(user_gender);
+
+            if (gender.length == count - 1) {
+              var male = ["male", count_element("male", gender)];
+              var female = ["female", count_element("female", gender)];
+              var not_set = ["not set", count_element("not set", gender)];
+              pie_chart_data = [male, female, not_set];
+              get_pie_chart(pie_chart_data);
+            }
+          });
 
           count = count + 1;
         });
@@ -76,6 +89,7 @@ $(function () {
         result += "<td class='comment_td_4'>按讚數</td>"
         result += "</tr></thead><tbody>";
 
+        var gender = new Array();
         var count = 1;
 
         $.each(response_data.data, function (data, user_obj) {
@@ -85,6 +99,18 @@ $(function () {
           result += "<td>" + user_obj.message + "</td>";
           result += "<td>" + user_obj.like_count + "</td>";
           result += "</tr>";
+
+          get_gender(user_obj.from.id, function(user_gender){
+            gender.push(user_gender);
+
+            if (gender.length == count - 1) {
+              var male = ["male", count_element("male", gender)];
+              var female = ["female", count_element("female", gender)];
+              var not_set = ["not set", count_element("not set", gender)];
+              pie_chart_data = [male, female, not_set];
+              get_pie_chart(pie_chart_data);
+            }
+          });
 
           count = count + 1;
         });
@@ -107,7 +133,6 @@ $(function () {
         status_change_callback(response);
     });
   });
-
 
   $("#export_csv").click(function () {
     $("#result").tableExport({ type: "csv", escape: "false", ignoreColumn:"[2, 3]" });
@@ -187,6 +212,7 @@ $(function () {
   }
 
   function get_shares(token, fb_post_id) {
+    $("#chart").html("");
     $("#result").html("");
     $("#lottery_result").hide();
 
@@ -224,6 +250,50 @@ $(function () {
         show_warning_message("讀取 Facebook 發生錯誤，請稍後再試，謝謝。");
       }
     });
+  }
+
+  function get_gender(fb_id, callback) {
+    var api_url = "https://graph.facebook.com/" + fb_id;
+    console.log(api_url);
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var user_gender = "";
+        if (response_data.hasOwnProperty("gender")) {
+          user_gender = response_data.gender;
+        } else {
+          user_gender = "not set";
+        }
+
+        if(typeof callback === "function") callback(user_gender);
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 性別 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function count_element(item, array) {
+    var count = 0;
+    $.each(array, function(i,v) { if (v === item) count++; });
+    return count;
+  }
+
+  function get_pie_chart(data) {
+    var chart = c3.generate({
+    data: {
+      columns: data,
+      type : 'pie',
+      colors: {
+        "male": "#017CDC",
+        "female": "#009F5D",
+        "not set": "#F8BD0D"
+      },
+    }
+  });
   }
 
   function show_success_message(message){

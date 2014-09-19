@@ -13,3 +13,4 @@
 + [Jquery](https://github.com/jquery/jquery)
 + [Bootstrap](https://github.com/twbs/bootstrap)
 + [tableExport.jquery.plugin](https://github.com/kayalshri/tableExport.jquery.plugin)
++ [c3.js](https://github.com/masayuki0812/c3)
