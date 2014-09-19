@@ -65,7 +65,7 @@ $(function () {
         show_success_message();
       },
       error: function() {
-        show_warning_message("讀取 Facebook 發生錯誤，請稍後再試，謝謝。");
+        show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
       }
     });
   });
@@ -123,7 +123,7 @@ $(function () {
         show_success_message();
       },
       error: function() {
-        show_warning_message("讀取 Facebook 發生錯誤，請稍後再試，謝謝。");
+        show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
       }
     });
   });
@@ -247,7 +247,7 @@ $(function () {
         show_success_message();
       },
       error: function() {
-        show_warning_message("讀取 Facebook 發生錯誤，請稍後再試，謝謝。");
+        show_warning_message("讀取 Facebook 分享 - 發生錯誤，請稍後再試，謝謝。");
       }
     });
   }
