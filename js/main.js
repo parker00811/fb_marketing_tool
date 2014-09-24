@@ -39,7 +39,7 @@ $(function () {
         $.each(response_data.data, function (data, user_obj) {
           result += "<tr class='tr_" + count.toString() + "'>"
           result += "<td>" + count.toString() + "</td>";
-          result += "<td>" + user_obj.id + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.id + "' target='_blank'>" + user_obj.id + "</a></td>";
           result += "</tr>";
 
           get_gender(user_obj.id, function(user_gender){
@@ -95,7 +95,7 @@ $(function () {
         $.each(response_data.data, function (data, user_obj) {
           result += "<tr class='tr_" + count.toString() + "'>"
           result += "<td>" + count.toString() + "</td>";
-          result += "<td>" + user_obj.from.id + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
           result += "<td>" + user_obj.message + "</td>";
           result += "<td>" + user_obj.like_count + "</td>";
           result += "</tr>";
@@ -233,7 +233,7 @@ $(function () {
         $.each(response_data.data, function (data, user_obj) {
           result += "<tr class='tr_" + count.toString() + "'>"
           result += "<td>" + count.toString() + "</td>";
-          result += "<td>" + user_obj.from.id + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
           result += "</tr>";
 
           count = count + 1;
@@ -254,7 +254,6 @@ $(function () {
 
   function get_gender(fb_id, callback) {
     var api_url = "https://graph.facebook.com/" + fb_id;
-    console.log(api_url);
 
     $.ajax({
       url: api_url,
