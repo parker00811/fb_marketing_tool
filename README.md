@@ -1,4 +1,4 @@
-## [Facebook 行銷小工具](https://dl.dropboxusercontent.com/u/42522448/fb_analysis/index.html)
+## [Facebook 行銷小工具](http://joe11051105.github.io/fb_marketing_tool/)
 
 ### 功能
 + 抓取貼文按讚的 fb_id。
