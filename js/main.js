@@ -216,7 +216,7 @@ $(function () {
     $("#result").html("");
     $("#lottery_result").hide();
 
-    var api_url = "https://graph.facebook.com/" + fb_post_id + "/sharedposts?access_token=" + token;
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/sharedposts?fields=from&access_token=" + token;
 
     $.ajax({
       url: api_url,
