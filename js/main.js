@@ -130,7 +130,11 @@ $(function () {
 
   $("#shares").click(function () {
     FB.getLoginStatus(function(response) {
-        status_change_callback(response);
+        var token = status_change_callback(response);
+        if (token != null) {
+          var fb_post_id = $("#fb_id").val();
+          get_shares(token, fb_post_id);
+        }
     });
   });
 
@@ -202,9 +206,7 @@ $(function () {
       FB.login(function(response){
         FB.getLoginStatus(function(response) {
           if (response.status === "connected") {
-            var token = response.authResponse.accessToken;
-            var fb_post_id = $("#fb_id").val();
-            get_shares(token, fb_post_id);
+            return response.authResponse.accessToken;
           }
         });
       }, {scope: "read_stream"});
@@ -216,7 +218,7 @@ $(function () {
     $("#result").html("");
     $("#lottery_result").hide();
 
-    var api_url = "https://graph.facebook.com/" + fb_post_id + "/sharedposts?fields=from&access_token=" + token;
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/sharedposts?limit=25&access_token=" + token;
 
     $.ajax({
       url: api_url,
@@ -239,12 +241,54 @@ $(function () {
           count = count + 1;
         });
 
-        result += "</tbody>";
+        if (response_data.paging.next != null) {
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          get_shares_after(token, fb_post_id, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          show_success_message();
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 分享 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
 
-        $("#result").html(result);
-        $("#result").attr("data-count", count);
+  function get_shares_after(token, fb_post_id, after) {
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/sharedposts?limit=25&access_token=" + token + "&after=" + after;
 
-        show_success_message();
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result;
+
+        var count = parseInt($("#result").attr("data-count"));
+
+        $.each(response_data.data, function (data, user_obj) {
+          result += "<tr class='tr_" + count.toString() + "'>"
+          result += "<td>" + count.toString() + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
+          result += "</tr>";
+
+          count = count + 1;
+        });
+
+        if (response_data.paging.next != null) {
+          $("#result > tbody").append(result);
+          $("#result").attr("data-count", count);
+          get_shares_after(token, fb_post_id, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result > tbody").append(result);
+          $("#result").attr("data-count", count);
+          show_success_message();
+        }
       },
       error: function() {
         show_warning_message("讀取 Facebook 分享 - 發生錯誤，請稍後再試，謝謝。");
