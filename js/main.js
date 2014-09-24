@@ -18,6 +18,7 @@ $(function () {
 
   $("#likes").click(function () {
     $("#result").html("");
+    $("#chart").html("");
     $("#lottery_result").hide();
 
     var fb_post_id = $("#fb_id").val();
@@ -72,6 +73,7 @@ $(function () {
 
   $("#comments").click(function () {
     $("#result").html("");
+    $("#chart").html("");
     $("#lottery_result").hide();
 
     var fb_post_id = $("#fb_id").val();
