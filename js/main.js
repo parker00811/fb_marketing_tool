@@ -188,7 +188,7 @@ $(function () {
     lottery_list = new Array();
     var i = 0;
     while (i < item_count){
-      var random_number = random_int_from_interval(1, pepole_count)
+      var random_number = random_int_from_interval(1, pepole_count - 1)
       if ($.inArray(random_number, lottery_list) == -1) {
         lottery_list.push(random_number);
         i = i + 1;
