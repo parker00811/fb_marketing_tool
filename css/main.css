@@ -28,6 +28,18 @@
   visibility: hidden;
 }
 
+.tr_center {
+  text-align: center;
+}
+
+.article_td_1 {
+  width: 79%;
+}
+
+.article_td_2, .article_td_3, .article_td_4 {
+  width: 7%;
+}
+
 .like_td_1, .like_td_2, .share_td_1, .share_td_2 {
   width: 50%;
 }

@@ -1,4 +1,7 @@
 $(function () {
+  var pages_posts_count = 0;
+  var pages_timeoutid;
+
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '794463723939962',
@@ -140,6 +143,16 @@ $(function () {
     });
   });
 
+  $("#articles").click(function () {
+    FB.getLoginStatus(function(response) {
+        var token = status_change_callback(response);
+        if (token != null) {
+          var fb_page_id = $("#fb_page_id").val();
+          get_posts(token, fb_page_id);
+        }
+    });
+  });
+
   $("#export_csv").click(function () {
     $("#result").tableExport({ type: "csv", escape: "false", ignoreColumn:"[2, 3]" });
   });
@@ -201,9 +214,7 @@ $(function () {
 
   function status_change_callback(response) {
     if (response.status === "connected") {
-      var token = response.authResponse.accessToken;
-      var fb_post_id = $("#fb_id").val();
-      get_shares(token, fb_post_id);
+      return response.authResponse.accessToken;
     } else {
       FB.login(function(response){
         FB.getLoginStatus(function(response) {
@@ -298,6 +309,155 @@ $(function () {
     });
   }
 
+  function get_posts(token, fb_page_id) {
+    pages_posts_count = 0
+    $("#result").html("");
+
+    var days = 7
+    var end_date = $.format.date(new Date(), "yyyy/MM/dd");
+    var start_date = $.format.date(new Date(new Date().getTime() - days * 24 * 60 * 60 * 1000), "yyyy/MM/dd");
+
+    var end_strtotime = Date.parse(end_date) / 1000;
+    var start_strtotime = Date.parse(start_date) / 1000;
+
+    var api_url = "https://graph.facebook.com/" + fb_page_id + "/posts?limit=25&until=" + end_date + "&since=" + start_date + "&access_token=" + token;
+    var end;
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result = "<thead><tr>";
+        var count = 1;
+
+        result += "<td class='article_td_1'>內容</td>"
+        result += "<td class='article_td_2'>按讚數</td>"
+        result += "<td class='article_td_3'>留言數</td>"
+        result += "<td class='article_td_4'>分享數</td>"
+        result += "</tr></thead><tbody>";
+
+        $.each(response_data.data, function (data, post_obj) {
+
+          if (Date.parse($.format.date(post_obj.created_time, "yyyy/MM/dd")) / 1000 < start_strtotime) {
+            end = true;
+            return false;
+          }
+
+          if (post_obj.type != "status") {
+            result += "<tr>"
+            result += "<td class='tr_id_" + count + "' data-date='" + $.format.date(post_obj.created_time, "yyyy/MM/dd")
+                   + "'><a href='https://www.facebook.com/" + post_obj.id.split("_")[0] + "/posts/" + post_obj.id.split("_")[1]
+                   + "' target='_blank'>" + post_obj.message + "</a></td>"
+            result += "<td class='tr_center tr_likes_" + count + "'>" + 0 + "</td>";
+            result += "<td class='tr_center tr_comments_" + count + "'>" + 0 + "</td>";
+            result += "<td class='tr_center tr_shares_" + count + "'>" + 0 + "</td>";
+            result += "</tr>";
+
+            $(".tr_id_" + count).attr("data-id", $.format.date(post_obj.created_time, "yyyy/MM/dd"));
+
+            if (post_obj.type == "photo") {
+              get_post_summary_count(post_obj.object_id, "likes", token, ".tr_likes_" + count);
+              get_post_summary_count(post_obj.object_id, "comments", token, ".tr_comments_" + count);
+              get_post_summary_count(post_obj.object_id, "shares", token, ".tr_shares_" + count);
+            } else {
+              get_post_summary_count(post_obj.id.split("_")[1], "likes", token, ".tr_likes_" + count);
+              get_post_summary_count(post_obj.id.split("_")[1], "comments", token, ".tr_comments_" + count);
+              get_post_summary_count(post_obj.id, "shares", token, ".tr_shares_" + count);
+            }
+
+            count = count + 1;
+          }
+        });
+
+        if (end != true) {
+          $("#result").html(result);
+          get_posts_after(token, response_data.paging.next, start_strtotime, count);
+        } else {
+          result += "</tbody>";
+          $("#result").html(result);
+
+          pages_timeoutid = setInterval(function() {
+            if(count - 1 == pages_posts_count / 3){
+              clearInterval(pages_timeoutid);
+              article_summary(count);
+              show_success_message();
+            }
+          }, 2000)
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 文章統計 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function get_posts_after(token, url, start_strtotime, count) {
+    var api_url = url + "&access_token=" + token;
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result = "";
+        var end;
+
+        $.each(response_data.data, function (data, post_obj) {
+
+          if (Date.parse($.format.date(post_obj.created_time, "yyyy/MM/dd")) / 1000 < start_strtotime) {
+            end = true;
+            return false;
+          }
+
+          if (post_obj.type != "status") {
+            result += "<tr>"
+            result += "<td class='tr_id_" + count + "' data-date='" + $.format.date(post_obj.created_time, "yyyy/MM/dd")
+                   + "'><a href='https://www.facebook.com/" + post_obj.id.split("_")[0] + "/posts/" + post_obj.id.split("_")[1]
+                   + "' target='_blank'>" + post_obj.message + "</a></td>"
+            result += "<td class='tr_center tr_likes_" + count + "'>" + 0 + "</td>";
+            result += "<td class='tr_center tr_comments_" + count + "'>" + 0 + "</td>";
+            result += "<td class='tr_center tr_shares_" + count + "'>" + 0 + "</td>";
+            result += "</tr>";
+
+
+
+            if (post_obj.type == "photo") {
+              get_post_summary_count(post_obj.object_id, "likes", token, ".tr_likes_" + count);
+              get_post_summary_count(post_obj.object_id, "comments", token, ".tr_comments_" + count);
+              get_post_summary_count(post_obj.object_id, "shares", token, ".tr_shares_" + count);
+            } else {
+              get_post_summary_count(post_obj.id.split("_")[1], "likes", token, ".tr_likes_" + count);
+              get_post_summary_count(post_obj.id.split("_")[1], "comments", token, ".tr_comments_" + count);
+              get_post_summary_count(post_obj.id, "shares", token, ".tr_shares_" + count);
+            }
+
+            count = count + 1;
+          }
+        });
+
+        if (end != true) {
+          $("#result > tbody").append(result);
+          get_posts_after(token, response_data.paging.next, start_strtotime, count);
+        } else {
+          result += "</tbody>";
+          $("#result > tbody").append(result);
+
+          pages_timeoutid = setInterval(function() {
+            if(count - 1 == pages_posts_count / 3){
+              clearInterval(pages_timeoutid);
+              article_summary(count);
+              show_success_message();
+            }
+          }, 2000)
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 文章統計 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
   function get_gender(fb_id, callback) {
     var api_url = "https://graph.facebook.com/" + fb_id;
 
@@ -321,6 +481,66 @@ $(function () {
     });
   }
 
+  function get_post_summary_count(fb_post_id, type, token, classname) {
+    var api_url;
+
+    if (type == "likes" || type == "comments") {
+      api_url = "https://graph.facebook.com/" + fb_post_id + "/" + type + "?summary=true&access_token=" + token;
+    } else if (type == "shares") {
+      api_url = "https://graph.facebook.com/" + fb_post_id + "?access_token=" + token;
+    }
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        if (type == "likes" || type == "comments") {
+          $(classname).text(response_data.summary.total_count);
+        } else if (type == "shares") {
+          if (response_data.hasOwnProperty("shares")) {
+            $(classname).text(response_data.shares.count);
+          } else {
+            $(classname).text(0);
+          }
+        }
+        pages_posts_count += 1;
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 文章按讚數 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function article_summary(count) {
+    var x_category = new Array();
+    var data_likes = [0, 0, 0, 0, 0, 0, 0];
+    var data_comments = [0, 0, 0, 0, 0, 0, 0];
+    var data_shares = [0, 0, 0, 0, 0, 0, 0];
+
+    $.each([7, 6, 5, 4, 3, 2, 1], function(index, value) {
+      x_category.push($.format.date(new Date(new Date().getTime() - value * 24 * 60 * 60 * 1000), "yyyy/MM/dd"));
+    });
+
+    for ( var i = 1; i < count; i++ ) {
+      var date = $(".tr_id_" + i).attr("data-date");
+      var likes = parseInt($(".tr_likes_" + i).text());
+      var comments = parseInt($(".tr_comments_" + i).text());
+      var shares = parseInt($(".tr_shares_" + i).text());
+      var index = $.inArray(date, x_category)
+
+      data_likes[index] += likes;
+      data_comments[index] += comments;
+      data_shares[index] += shares;
+    }
+
+    data_likes.unshift("按讚數");
+    data_comments.unshift("留言數");
+    data_shares.unshift("分享數");
+
+    get_bar_chart([data_likes, data_comments, data_shares], x_category);
+  }
+
   function count_element(item, array) {
     var count = 0;
     $.each(array, function(i,v) { if (v === item) count++; });
@@ -329,16 +549,36 @@ $(function () {
 
   function get_pie_chart(data) {
     var chart = c3.generate({
-    data: {
-      columns: data,
-      type : 'pie',
-      colors: {
-        "male": "#017CDC",
-        "female": "#009F5D",
-        "not set": "#F8BD0D"
+      data: {
+        columns: data,
+        type : 'pie',
+        colors: {
+          "male": "#017CDC",
+          "female": "#009F5D",
+          "not set": "#F8BD0D"
+        }
+      }
+    });
+  }
+
+  function get_bar_chart(data, x_category) {
+    var chart = c3.generate({
+      data: {
+        columns: data,
+        type : 'bar',
+        colors: {
+          "male": "#017CDC",
+          "female": "#009F5D",
+          "not set": "#F8BD0D"
+        }
       },
-    }
-  });
+      axis: {
+        x: {
+          type: "category",
+          categories: x_category
+        }
+      }
+    });
   }
 
   function show_success_message(message){
