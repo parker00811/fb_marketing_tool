@@ -6,13 +6,13 @@
   font-size: 14px;
 }
 
-.container {
-  padding: 100px 15px;
+.fb-like {
+  float: right;
+  line-height: 35px;
 }
 
-.cover-container {
-  width: 110px;
-  margin: 30px auto;
+.container {
+  padding: 100px 15px;
 }
 
 #result, #lottery_result, #chart {
