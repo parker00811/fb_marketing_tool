@@ -54,7 +54,7 @@ $(function () {
               var female = ["female", count_element("female", gender)];
               var not_set = ["not set", count_element("not set", gender)];
               pie_chart_data = [male, female, not_set];
-              get_pie_chart(pie_chart_data);
+              var chart = get_pie_chart(pie_chart_data);
             }
           });
 
@@ -530,7 +530,7 @@ $(function () {
     data_comments.unshift("留言數");
     data_shares.unshift("分享數");
 
-    get_bar_chart([data_likes, data_comments, data_shares], x_category);
+    var chart = get_bar_chart([data_likes, data_comments, data_shares], x_category);
   }
 
   function count_element(item, array) {
@@ -540,7 +540,7 @@ $(function () {
   }
 
   function get_pie_chart(data) {
-    var chart = c3.generate({
+    return c3.generate({
       data: {
         columns: data,
         type : 'pie',
@@ -554,7 +554,7 @@ $(function () {
   }
 
   function get_bar_chart(data, x_category) {
-    var chart = c3.generate({
+    return c3.generate({
       data: {
         columns: data,
         type : 'bar',
