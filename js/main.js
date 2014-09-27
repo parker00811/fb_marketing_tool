@@ -324,9 +324,10 @@ $(function () {
         var count = 1;
 
         result += "<td class='article_td_1'>內容</td>"
-        result += "<td class='article_td_2'>按讚數</td>"
-        result += "<td class='article_td_3'>留言數</td>"
-        result += "<td class='article_td_4'>分享數</td>"
+        result += "<td class='article_td_2'>貼文種類</td>"
+        result += "<td class='article_td_3'>按讚數</td>"
+        result += "<td class='article_td_4'>留言數</td>"
+        result += "<td class='article_td_5'>分享數</td>"
         result += "</tr></thead><tbody>";
 
         $.each(response_data.data, function (data, post_obj) {
@@ -341,6 +342,7 @@ $(function () {
             result += "<td class='tr_id_" + count + "' data-date='" + $.format.date(post_obj.created_time, "yyyy/MM/dd")
                    + "'><a href='https://www.facebook.com/" + post_obj.id.split("_")[0] + "/posts/" + post_obj.id.split("_")[1]
                    + "' target='_blank'>" + post_obj.message + "</a></td>"
+            result += "<td class='tr_center tr_type_" + count + "'>" + post_obj.type + "</td>";
             result += "<td class='tr_center tr_likes_" + count + "'>" + 0 + "</td>";
             result += "<td class='tr_center tr_comments_" + count + "'>" + 0 + "</td>";
             result += "<td class='tr_center tr_shares_" + count + "'>" + 0 + "</td>";
@@ -407,6 +409,7 @@ $(function () {
             result += "<td class='tr_id_" + count + "' data-date='" + $.format.date(post_obj.created_time, "yyyy/MM/dd")
                    + "'><a href='https://www.facebook.com/" + post_obj.id.split("_")[0] + "/posts/" + post_obj.id.split("_")[1]
                    + "' target='_blank'>" + post_obj.message + "</a></td>"
+            result += "<td class='tr_center tr_type_" + count + "'>" + post_obj.type + "</td>";
             result += "<td class='tr_center tr_likes_" + count + "'>" + 0 + "</td>";
             result += "<td class='tr_center tr_comments_" + count + "'>" + 0 + "</td>";
             result += "<td class='tr_center tr_shares_" + count + "'>" + 0 + "</td>";
