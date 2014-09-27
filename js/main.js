@@ -135,21 +135,13 @@ $(function () {
 
   $("#shares").click(function () {
     FB.getLoginStatus(function(response) {
-        var token = status_change_callback(response);
-        if (token != null) {
-          var fb_post_id = $("#fb_id").val();
-          get_shares(token, fb_post_id);
-        }
+      status_change_callback(response, $("#fb_id").val(), get_shares);
     });
   });
 
   $("#articles").click(function () {
     FB.getLoginStatus(function(response) {
-        var token = status_change_callback(response);
-        if (token != null) {
-          var fb_page_id = $("#fb_page_id").val();
-          get_posts(token, fb_page_id);
-        }
+      status_change_callback(response, $("#fb_page_id").val(), get_posts);
     });
   });
 
@@ -212,14 +204,14 @@ $(function () {
     return lottery_list;
   }
 
-  function status_change_callback(response) {
+  function status_change_callback(response, id, callback) {
     if (response.status === "connected") {
-      return response.authResponse.accessToken;
+      callback(response.authResponse.accessToken, id);
     } else {
       FB.login(function(response){
         FB.getLoginStatus(function(response) {
           if (response.status === "connected") {
-            return response.authResponse.accessToken;
+            callback(response.authResponse.accessToken, id);
           }
         });
       }, {scope: "read_stream"});
