@@ -41,11 +41,17 @@
 }
 
 .article_td_1 {
-  width: 69%;
+  width: 68%;
 }
 
-.article_td_2, .article_td_3, .article_td_4, .article_td_5 {
+.article_td_2 {
+  width: 8%;
+  text-align: center;
+}
+
+.article_td_3, .article_td_4, .article_td_5 {
   width: 7%;
+  text-align: center;
 }
 
 .like_td_1, .like_td_2, .share_td_1, .share_td_2 {
