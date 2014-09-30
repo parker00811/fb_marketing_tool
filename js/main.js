@@ -244,7 +244,6 @@ $(function () {
     $("#chart").html("");
     $("#lottery_result").hide();
 
-    var fb_post_id = $("#fb_id").val();
     var api_url = "https://graph.facebook.com/" + fb_post_id + "/comments?limit=25";
 
     $.ajax({
