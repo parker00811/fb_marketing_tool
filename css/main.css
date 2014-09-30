@@ -74,6 +74,10 @@
   width: 10%;
 }
 
+#fb_id {
+  width: 230px;
+}
+
 #loading-little {
     top: 0px;
     position: fixed;
