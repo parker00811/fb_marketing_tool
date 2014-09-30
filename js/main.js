@@ -20,117 +20,11 @@ $(function () {
    }(document, 'script', 'facebook-jssdk'));
 
   $("#likes").click(function () {
-    $("#result").html("");
-    $("#chart").html("");
-    $("#lottery_result").hide();
-
-    var fb_post_id = $("#fb_id").val();
-    var api_url = "https://graph.facebook.com/" + fb_post_id + "/likes";
-
-    $.ajax({
-      url: api_url,
-      type: "GET",
-      dataType: "json",
-      success: function(response_data) {
-        var result = "<thead><tr>";
-        result += "<td class='like_td_1'>序號</td>"
-        result += "<td class='like_td_2'>facebook id</td>"
-        result += "</tr></thead><tbody>";
-
-        var gender = new Array();
-        var count = 1;
-
-        $.each(response_data.data, function (data, user_obj) {
-          result += "<tr class='tr_" + count.toString() + "'>"
-          result += "<td>" + count.toString() + "</td>";
-          result += "<td><a href='https://www.facebook.com/" + user_obj.id + "' target='_blank'>" + user_obj.id + "</a></td>";
-          result += "</tr>";
-
-          get_gender(user_obj.id, function(user_gender){
-            gender.push(user_gender);
-
-            if (gender.length == count - 1) {
-              var male = ["male", count_element("male", gender)];
-              var female = ["female", count_element("female", gender)];
-              var not_set = ["not set", count_element("not set", gender)];
-              pie_chart_data = [male, female, not_set];
-              var chart = get_pie_chart(pie_chart_data);
-            }
-          });
-
-          count = count + 1;
-        });
-
-        result += "</tbody>";
-
-        $("#result").html(result);
-        $("#result").attr("data-count", count);
-        $("#result").show();
-        show_success_message();
-      },
-      error: function() {
-        show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
-      }
-    });
+    get_likes($("#fb_id").val());
   });
 
   $("#comments").click(function () {
-    $("#result").html("");
-    $("#chart").html("");
-    $("#lottery_result").hide();
-
-    var fb_post_id = $("#fb_id").val();
-    var api_url = "https://graph.facebook.com/" + fb_post_id + "/comments";
-
-    $.ajax({
-      url: api_url,
-      type: "GET",
-      dataType: "json",
-      success: function(response_data) {
-        var result = "<thead><tr>";
-        result += "<td class='comment_td_1'>序號</th>"
-        result += "<td class='comment_td_2'>facebook id</td>"
-        result += "<td class='comment_td_3'>留言內容</td>"
-        result += "<td class='comment_td_4'>按讚數</td>"
-        result += "</tr></thead><tbody>";
-
-        var gender = new Array();
-        var count = 1;
-
-        $.each(response_data.data, function (data, user_obj) {
-          result += "<tr class='tr_" + count.toString() + "'>"
-          result += "<td>" + count.toString() + "</td>";
-          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
-          result += "<td>" + user_obj.message + "</td>";
-          result += "<td>" + user_obj.like_count + "</td>";
-          result += "</tr>";
-
-          get_gender(user_obj.from.id, function(user_gender){
-            gender.push(user_gender);
-
-            if (gender.length == count - 1) {
-              var male = ["male", count_element("male", gender)];
-              var female = ["female", count_element("female", gender)];
-              var not_set = ["not set", count_element("not set", gender)];
-              pie_chart_data = [male, female, not_set];
-              get_pie_chart(pie_chart_data);
-            }
-          });
-
-          count = count + 1;
-        });
-
-        result += "</tbody>";
-
-        $("#result").html(result);
-        $("#result").attr("data-count", count);
-
-        show_success_message();
-      },
-      error: function() {
-        show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
-      }
-    });
+    get_comments($("#fb_id").val());
   });
 
   $("#shares").click(function () {
@@ -216,6 +110,183 @@ $(function () {
         });
       }, {scope: "read_stream"});
     }
+  }
+
+  function get_likes(fb_post_id) {
+    $("#result").html("");
+    $("#chart").html("");
+    $("#lottery_result").hide();
+
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/likes?limit=25";
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result = "<thead><tr>";
+        result += "<td class='like_td_1'>序號</td>"
+        result += "<td class='like_td_2'>facebook id</td>"
+        result += "</tr></thead><tbody>";
+
+        var gender = new Array();
+        var count = 1;
+
+        $.each(response_data.data, function (data, user_obj) {
+          result += "<tr class='tr_" + count.toString() + "'>"
+          result += "<td>" + count.toString() + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.id + "' target='_blank'>" + user_obj.id + "</a></td>";
+          result += "</tr>";
+
+          count = count + 1;
+        });
+
+        if (response_data.paging.next != null) {
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          get_likes_after(fb_post_id, gender, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          $("#result").show();
+          show_success_message();
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function get_likes_after(fb_post_id, gender, after) {
+     var api_url = "https://graph.facebook.com/" + fb_post_id + "/likes?limit=25&after=" + after;
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result;
+
+        var count = parseInt($("#result").attr("data-count"));
+
+        $.each(response_data.data, function (data, user_obj) {
+          result += "<tr class='tr_" + count.toString() + "'>"
+          result += "<td>" + count.toString() + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.id + "' target='_blank'>" + user_obj.id + "</a></td>";
+          result += "</tr>";
+
+          count = count + 1;
+        });
+
+        if (response_data.paging.next != null) {
+          $("#result").append(result);
+          $("#result").attr("data-count", count);
+          get_likes_after(fb_post_id, gender, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result").append(result);
+          $("#result").attr("data-count", count);
+          $("#result").show();
+          show_success_message();
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function get_comments(fb_post_id) {
+    $("#result").html("");
+    $("#chart").html("");
+    $("#lottery_result").hide();
+
+    var fb_post_id = $("#fb_id").val();
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/comments?limit=25";
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result = "<thead><tr>";
+        result += "<td class='comment_td_1'>序號</th>"
+        result += "<td class='comment_td_2'>facebook id</td>"
+        result += "<td class='comment_td_3'>留言內容</td>"
+        result += "<td class='comment_td_4'>按讚數</td>"
+        result += "</tr></thead><tbody>";
+
+        var gender = new Array();
+        var count = 1;
+
+        $.each(response_data.data, function (data, user_obj) {
+          result += "<tr class='tr_" + count.toString() + "'>"
+          result += "<td>" + count.toString() + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
+          result += "<td>" + user_obj.message + "</td>";
+          result += "<td>" + user_obj.like_count + "</td>";
+          result += "</tr>";
+
+          count = count + 1;
+        });
+
+        if (response_data.paging.next != null) {
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          get_comments_after(fb_post_id, gender, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result").html(result);
+          $("#result").attr("data-count", count);
+          show_success_message();
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
+  }
+
+  function get_comments_after(fb_post_id, gender, after) {
+    var api_url = "https://graph.facebook.com/" + fb_post_id + "/comments?limit=25&after=" + after;
+
+    $.ajax({
+      url: api_url,
+      type: "GET",
+      dataType: "json",
+      success: function(response_data) {
+        var result;
+
+        var count = parseInt($("#result").attr("data-count"));
+
+        $.each(response_data.data, function (data, user_obj) {
+          result += "<tr class='tr_" + count.toString() + "'>"
+          result += "<td>" + count.toString() + "</td>";
+          result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
+          result += "<td>" + user_obj.message + "</td>";
+          result += "<td>" + user_obj.like_count + "</td>";
+          result += "</tr>";
+
+          count = count + 1;
+        });
+
+        if (response_data.paging.next != null) {
+          $("#result").append(result);
+          $("#result").attr("data-count", count);
+          get_comments_after(fb_post_id, gender, response_data.paging.cursors.after);
+        } else {
+          result += "</tbody>";
+          $("#result").append(result);
+          $("#result").attr("data-count", count);
+          show_success_message();
+        }
+      },
+      error: function() {
+        show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
+      }
+    });
   }
 
   function get_shares(token, fb_post_id) {
