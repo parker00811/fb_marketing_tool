@@ -20,19 +20,52 @@ $(function () {
    }(document, 'script', 'facebook-jssdk'));
 
   $("#likes").click(function () {
+    var post_id = parse_post_id($("#fb_id").val());
+
+    if (post_id == null) {
+      show_warning_message("輸入的網址或 id 有問題，請再次檢查確認！");
+      $("#result").html("");
+      $("#chart").html("");
+      $("#lottery_result").hide();
+
+      return false;
+    }
+
     set_button_group_disabled(true);
-    get_likes($("#fb_id").val());
+    get_likes(post_id);
   });
 
   $("#comments").click(function () {
+    var post_id = parse_post_id($("#fb_id").val());
+
+    if (post_id == null) {
+      show_warning_message("輸入的網址或 id 有問題，請再次檢查確認！");
+      $("#result").html("");
+      $("#chart").html("");
+      $("#lottery_result").hide();
+
+      return false;
+    }
+
     set_button_group_disabled(true);
-    get_comments($("#fb_id").val());
+    get_comments(post_id);
   });
 
   $("#shares").click(function () {
+    var post_id = parse_post_id($("#fb_id").val());
+
+    if (post_id == null) {
+      show_warning_message("輸入的網址或 id 有問題，請再次檢查確認！");
+      $("#result").html("");
+      $("#chart").html("");
+      $("#lottery_result").hide();
+
+      return false;
+    }
+
     set_button_group_disabled(true);
     FB.getLoginStatus(function(response) {
-      status_change_callback(response, $("#fb_id").val(), get_shares);
+      status_change_callback(response, post_id, get_shares);
     });
   });
 
@@ -694,5 +727,25 @@ $(function () {
     $("#lottery").attr('disabled', boolean_value);
     $("#export_lottery_csv").attr('disabled', boolean_value);
     $("#articles").attr('disabled', boolean_value);
+  }
+
+  function parse_post_id(url) {
+    if (url.indexOf("/photos/") > -1) {
+      var temp = url.match("/[0-9]+/");
+
+      if (temp != null) {
+        return temp[0].match("[0-9]+")[0];
+      }
+    } else if (url.indexOf("/posts/") > -1) {
+      var temp = url.match("[0-9]+");
+
+      if (temp != null) {
+        return temp[0];
+      }
+    } else {
+      if (isNaN(parseInt(url)) == false) {
+        return url;
+      }
+    }
   }
 });
