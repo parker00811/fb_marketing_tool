@@ -20,20 +20,24 @@ $(function () {
    }(document, 'script', 'facebook-jssdk'));
 
   $("#likes").click(function () {
+    set_button_group_disabled(true);
     get_likes($("#fb_id").val());
   });
 
   $("#comments").click(function () {
+    set_button_group_disabled(true);
     get_comments($("#fb_id").val());
   });
 
   $("#shares").click(function () {
+    set_button_group_disabled(true);
     FB.getLoginStatus(function(response) {
       status_change_callback(response, $("#fb_id").val(), get_shares);
     });
   });
 
   $("#articles").click(function () {
+    set_button_group_disabled(true);
     FB.getLoginStatus(function(response) {
       status_change_callback(response, $("#fb_page_id").val(), get_posts);
     });
@@ -151,10 +155,12 @@ $(function () {
           $("#result").attr("data-count", count);
           $("#result").show();
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -190,10 +196,12 @@ $(function () {
           $("#result").attr("data-count", count);
           $("#result").show();
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 按讚 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -241,10 +249,12 @@ $(function () {
           $("#result").html(result);
           $("#result").attr("data-count", count);
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -281,10 +291,12 @@ $(function () {
           $("#result").append(result);
           $("#result").attr("data-count", count);
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 留言 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -326,10 +338,12 @@ $(function () {
           $("#result").html(result);
           $("#result").attr("data-count", count);
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 分享 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -364,10 +378,12 @@ $(function () {
           $("#result > tbody").append(result);
           $("#result").attr("data-count", count);
           show_success_message();
+          set_button_group_disabled(false);
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 分享 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -447,12 +463,14 @@ $(function () {
               clearInterval(pages_timeoutid);
               article_summary(count);
               show_success_message();
+              set_button_group_disabled(false);
             }
           }, 2000)
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 文章統計 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -514,12 +532,14 @@ $(function () {
               clearInterval(pages_timeoutid);
               article_summary(count);
               show_success_message();
+              set_button_group_disabled(false);
             }
           }, 2000)
         }
       },
       error: function() {
         show_warning_message("讀取 Facebook 文章統計 - 發生錯誤，請稍後再試，謝謝。");
+        set_button_group_disabled(false);
       }
     });
   }
@@ -664,5 +684,15 @@ $(function () {
     notification_obj.html(message);
     notification_obj.show("slow");
     setTimeout(function(){ notification_obj.hide("slow"); }, 3000);
+  }
+
+  function set_button_group_disabled(boolean_value) {
+    $("#likes").attr('disabled', boolean_value);
+    $("#comments").attr('disabled', boolean_value);
+    $("#shares").attr('disabled', boolean_value);
+    $("#export_csv").attr('disabled', boolean_value);
+    $("#lottery").attr('disabled', boolean_value);
+    $("#export_lottery_csv").attr('disabled', boolean_value);
+    $("#articles").attr('disabled', boolean_value);
   }
 });
