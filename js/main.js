@@ -361,7 +361,7 @@ $(function () {
           count = count + 1;
         });
 
-        if (response_data.paging.next != null) {
+        if (response_data.hasOwnProperty("paging")) {
           $("#result").html(result);
           $("#result").attr("data-count", count);
           get_shares_after(token, fb_post_id, response_data.paging.cursors.after);
@@ -401,7 +401,7 @@ $(function () {
           count = count + 1;
         });
 
-        if (response_data.paging.next != null) {
+        if (response_data.hasOwnProperty("paging")) {
           $("#result > tbody").append(result);
           $("#result").attr("data-count", count);
           get_shares_after(token, fb_post_id, response_data.paging.cursors.after);
