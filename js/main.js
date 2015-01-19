@@ -77,7 +77,7 @@ $(function () {
   });
 
   $("#export_csv").click(function () {
-    $("#result").tableExport({ type: "csv", escape: "false", ignoreColumn:"[2, 3]" });
+    $("#result").tableExport({ type: "csv", escape: "false", ignoreColumn:"[2]" });
   });
 
   $("#export_lottery_csv").click(function () {
@@ -255,7 +255,7 @@ $(function () {
         result += "<td class='comment_td_1'>序號</th>"
         result += "<td class='comment_td_2'>facebook id</td>"
         result += "<td class='comment_td_3'>留言內容</td>"
-        result += "<td class='comment_td_4'>按讚數</td>"
+        result += "<td class='comment_td_4'>建立時間</td>"
         result += "</tr></thead><tbody>";
 
         var gender = new Array();
@@ -266,7 +266,7 @@ $(function () {
           result += "<td>" + count.toString() + "</td>";
           result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
           result += "<td>" + user_obj.message + "</td>";
-          result += "<td>" + user_obj.like_count + "</td>";
+          result += "<td>" + user_obj.created_time + "</td>";
           result += "</tr>";
 
           count = count + 1;
@@ -308,7 +308,7 @@ $(function () {
           result += "<td>" + count.toString() + "</td>";
           result += "<td><a href='https://www.facebook.com/" + user_obj.from.id + "' target='_blank'>" + user_obj.from.id + "</a></td>";
           result += "<td>" + user_obj.message + "</td>";
-          result += "<td>" + user_obj.like_count + "</td>";
+          result += "<td>" + user_obj.created_time + "</td>";
           result += "</tr>";
 
           count = count + 1;
